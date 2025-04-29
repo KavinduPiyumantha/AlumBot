@@ -184,6 +184,11 @@ def legacy_submit_local_file_list():
     logger.info("Redirecting API request from /open_kf_api/files/submit_local_file_list to /alumBot_api/files/submit_local_file_list")
     return files.submit_local_file_list()
 
+@app.route('/open_kf_api/files/delete_local_file_list', methods=['POST'])
+def legacy_delete_local_file_list():
+    logger.info("Redirecting API request from /open_kf_api/files/delete_local_file_list to /alumBot_api/files/delete_local_file_list")
+    return files.delete_local_file_list()
+
 # URLs API
 @app.route('/open_kf_api/urls/get_isolated_url_list', methods=['POST'])
 def legacy_get_isolated_url_list():
@@ -194,6 +199,11 @@ def legacy_get_isolated_url_list():
 def legacy_submit_isolated_url_list():
     logger.info("Redirecting API request from /open_kf_api/urls/submit_isolated_url_list to /alumBot_api/urls/submit_isolated_url_list")
     return urls.submit_isolated_url_list()
+
+@app.route('/open_kf_api/urls/delete_isolated_url_list', methods=['POST'])
+def legacy_delete_isolated_url_list():
+    logger.info("Redirecting API request from /open_kf_api/urls/delete_isolated_url_list to /alumBot_api/urls/delete_isolated_url_list")
+    return urls.delete_isolated_url_list()
 
 # Catch-all for any API endpoints we haven't explicitly mapped
 @app.route('/open_kf_api/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
