@@ -93,6 +93,25 @@ def serve_static_chatbot_original(path):
     return send_from_directory(f'{app.static_folder}/alumBot', path)
 
 
+@app.route('/web/<path:filename>')
+def serve_download_files(filename):
+    # The file is directly located in app.static_folder (not in a subdirectory called 'web')
+    file_path = safe_join(app.static_folder, filename)
+
+    # Check if the file exists and serve it if so
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        # Get directory name from the filename
+        dir_name = os.path.dirname(filename)
+        # Get base filename from the full path
+        base_filename = os.path.basename(filename)
+        # Serve the file from the correct directory
+        return send_from_directory(os.path.join(app.static_folder, dir_name), base_filename)
+    else:
+        # Return a 404 error if the file does not exist
+        logger.error(f"Download file not found: {file_path}")
+        return abort(404)
+
+
 # Register all API routes from blueprints
 app.register_blueprint(account.account_bp)
 app.register_blueprint(auth.auth_bp)

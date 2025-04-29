@@ -40,6 +40,7 @@ Quickly launch an intelligent customer service system with Flask, LLM, RAG, incl
 - [The frontend of admin console and chatbot](#the-frontend-of-admin-console-and-chatbot)
   - [admin console](#admin-console)
   - [chatbot](#chatbot)
+- [Database Maintenance](#database-maintenance)
 
 
 ## Features
@@ -442,3 +443,36 @@ An intuitive web-based admin interface for Smart QA Service, offering comprehens
 > [Code Repository](https://github.com/open-kf/smart-qa-h5)
 
 An HTML5 interface for Smart QA Service designed for easy integration into websites via iframe, providing users direct access to a tailored knowledge base without leaving the site, enhancing functionality and immediate query resolution.
+
+## Database Maintenance
+
+AlumBot includes utility scripts to help you manage and clean the databases when needed. These scripts provide a safe way to reset your system while preserving essential settings.
+
+### Cleaning the Database
+
+If you need to clean your database (for example, when refreshing your knowledge base or resolving issues), you can use the included cleaning scripts:
+
+```shell
+python clean_all_databases.py
+```
+
+This comprehensive cleaning tool will:
+
+1. **Back up your current database** before making any changes
+2. **Clean the SQLite database** - removes content data while preserving user accounts and settings
+3. **Clean the Chroma vector database** - removes document embeddings
+4. **Clean downloaded files** - removes all files from the `web/download_dir` folder
+
+> [!IMPORTANT]
+> Always make sure AlumBot is not running when performing database maintenance operations.
+
+After cleaning, you'll need to repopulate your knowledge base using the admin interface. Your user accounts, bot configuration, and manual interventions will remain intact.
+
+### Individual Cleaning Scripts
+
+You can also use the individual scripts for more targeted cleaning:
+
+- **`clean_database.py`** - Clean only the SQLite database
+- **`clean_chroma_db.py`** - Clean only the Chroma vector database
+
+Each script will create a backup before making changes, ensuring you can restore your data if needed.
