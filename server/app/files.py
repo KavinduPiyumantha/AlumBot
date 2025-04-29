@@ -32,7 +32,7 @@ from server.rag.index.parser.file_parser.markdown_parser import AsyncTextParser
 
 URL_PREFIX = os.getenv('URL_PREFIX')
 
-files_bp = Blueprint('files', __name__, url_prefix='/open_kf_api/files')
+files_bp = Blueprint('files', __name__, url_prefix='/alumBot_api/files')
 
 
 async def write_file_async(file_path: str, content: bytes) -> None:
@@ -212,8 +212,7 @@ def submit_local_file_list():
                     f'Local duplicate file detected: {file_.filename}')
                 return {
                     'retcode': -20004,
-                    'message':
-                    f'Local duplicate file detected: {file_.filename}'
+                    'message': f'Local duplicate file detected: {file_.filename}'
                 }
             md5_set.add(file_md5)
 
@@ -253,8 +252,7 @@ def submit_local_file_list():
                 f'Duplicate files found: {", ".join(duplicate_files)}')
             return {
                 'retcode': -20005,
-                'message':
-                f'Duplicate files found: {", ".join(duplicate_files)}'
+                'message': f'Duplicate files found: {", ".join(duplicate_files)}'
             }
 
         insert_data = []

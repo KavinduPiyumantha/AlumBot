@@ -7,9 +7,8 @@ from server.app.utils.sqlite_client import get_db_connection
 from server.app.utils.token_helper import TokenHelper
 from server.logger.logger_config import my_logger as logger
 
-account_bp = Blueprint('account_config',
-                       __name__,
-                       url_prefix='/open_kf_api/account')
+account_bp = Blueprint('account', __name__,
+                      url_prefix='/alumBot_api/account')
 
 
 @account_bp.route('/login', methods=['POST'])

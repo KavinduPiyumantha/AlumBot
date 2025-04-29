@@ -1,5 +1,5 @@
 <div align="center">
-<h1 align="center">RAG-GPT</h1>
+<h1 align="center">AlumBot - RAG-GPT</h1>
 Quickly launch an intelligent customer service system with Flask, LLM, RAG, including frontend, backend, and admin console.
 <br/>
 <a href="https://langchain-bot.open-sora.ai/" target="_blank"> Live Demo </a>
@@ -12,7 +12,7 @@ Quickly launch an intelligent customer service system with Flask, LLM, RAG, incl
 
 - [Features](#features)
 - [Online Retrieval Architecture](#online-retrieval-architecture)
-- [Deploy the RAG-GPT Service](#deploy-the-rag-gpt-service)
+- [Deploy the AlumBot Service](#deploy-the-alumbot-service)
   - [Step 1: Download repository code](#step-1-download-repository-code)
   - [Step 2: Configure variables of .env](#step-2-configure-variables-of-env)
     - [Using OpenAI as the LLM base](#using-openai-as-the-llm-base)
@@ -20,9 +20,9 @@ Quickly launch an intelligent customer service system with Flask, LLM, RAG, incl
     - [Using DeepSeek as the LLM base](#using-deepseek-as-the-llm-base)
     - [Using Moonshot as the LLM base](#using-moonshot-as-the-llm-base)
     - [Using local LLMs](#using-local-llms)
-  - [Step 3: Deploy RAG-GPT](#step-3-deploy-rag-gpt)
-    - [Deploy RAG-GPT using Docker](#deploy-rag-gpt-using-docker)
-    - [Deploy RAG-GPT from source code](#deploy-rag-gpt-from-source-code)
+  - [Step 3: Deploy AlumBot](#step-3-deploy-alumbot)
+    - [Deploy AlumBot using Docker](#deploy-alumbot-using-docker)
+    - [Deploy AlumBot from source code](#deploy-alumbot-from-source-code)
       - [Set up the Python running environment](#set-up-the-python-running-environment)
         - [Create and activate a virtual environment](#create-and-activate-a-virtual-environment)
         - [Install dependencies with pip](#install-dependencies-with-pip)
@@ -57,19 +57,19 @@ Quickly launch an intelligent customer service system with Flask, LLM, RAG, incl
 </div>
 
 
-## Deploy the RAG-GPT Service
+## Deploy the AlumBot Service
 
 ### Step 1: Download repository code
 
 Clone the repository:
 
 ```shell
-git clone https://github.com/open-kf/rag-gpt.git && cd rag-gpt
+git clone https://github.com/yourusername/AlumBot.git && cd AlumBot
 ```
 
 ### Step 2: Configure variables of .env
 
-Before starting the RAG-GPT service, you need to modify the related configurations for the program to initialize correctly. 
+Before starting the AlumBot service, you need to modify the related configurations for the program to initialize correctly. 
 
 #### Using OpenAI as the LLM base
 
@@ -84,14 +84,14 @@ LLM_NAME="OpenAI"
 OPENAI_API_KEY="xxxx"
 GPT_MODEL_NAME="gpt-4o-mini"
 MIN_RELEVANCE_SCORE=0.4
-BOT_TOPIC="xxxx"
+BOT_TOPIC="ALUMBOT"
 URL_PREFIX="http://127.0.0.1:7000/"
 USE_PREPROCESS_QUERY=1
 USE_RERANKING=1
 USE_DEBUG=0
 USE_LLAMA_PARSE=0
 LLAMA_CLOUD_API_KEY="xxxx"
-USE_GPT4O=0
+USE_GPT4O=1
 ```
 
 - Don't modify **`LLM_NAME`**
@@ -120,7 +120,7 @@ LLM_NAME="ZhipuAI"
 ZHIPUAI_API_KEY="xxxx"
 GLM_MODEL_NAME="glm-4-air"
 MIN_RELEVANCE_SCORE=0.4
-BOT_TOPIC="xxxx"
+BOT_TOPIC="ALUMBOT"
 URL_PREFIX="http://127.0.0.1:7000/"
 USE_PREPROCESS_QUERY=1
 USE_RERANKING=1
@@ -158,7 +158,7 @@ ZHIPUAI_API_KEY="xxxx"
 DEEPSEEK_API_KEY="xxxx"
 DEEPSEEK_MODEL_NAME="deepseek-chat"
 MIN_RELEVANCE_SCORE=0.4
-BOT_TOPIC="xxxx"
+BOT_TOPIC="ALUMBOT"
 URL_PREFIX="http://127.0.0.1:7000/"
 USE_PREPROCESS_QUERY=1
 USE_RERANKING=1
@@ -198,7 +198,7 @@ ZHIPUAI_API_KEY="xxxx"
 MOONSHOT_API_KEY="xxxx"
 MOONSHOT_MODEL_NAME="moonshot-v1-8k"
 MIN_RELEVANCE_SCORE=0.4
-BOT_TOPIC="xxxx"
+BOT_TOPIC="ALUMBOT"
 URL_PREFIX="http://127.0.0.1:7000/"
 USE_PREPROCESS_QUERY=1
 USE_RERANKING=1
@@ -238,7 +238,7 @@ LLM_NAME="Ollama"
 OLLAMA_MODEL_NAME="xxxx"
 OLLAMA_BASE_URL="http://127.0.0.1:11434"
 MIN_RELEVANCE_SCORE=0.4
-BOT_TOPIC="xxxx"
+BOT_TOPIC="ALUMBOT"
 URL_PREFIX="http://127.0.0.1:7000/"
 USE_PREPROCESS_QUERY=1
 USE_RERANKING=1
@@ -257,8 +257,8 @@ LLAMA_CLOUD_API_KEY="xxxx"
 - For more information about the meanings and usages of constants, you can check under the `server/constant` directory.
 
 
-### Step 3: Deploy RAG-GPT
-#### Deploy RAG-GPT using Docker
+### Step 3: Deploy AlumBot
+#### Deploy AlumBot using Docker
 
 > [!NOTE]
 > When deploying with Docker, pay special attention to the host of **URL_PREFIX** in the `.env` file. If using `Ollama`, also pay special attention to the host of **OLLAMA_BASE_URL** in the `.env` file. They need to use the actual IP address of the host machine.
@@ -268,7 +268,7 @@ LLAMA_CLOUD_API_KEY="xxxx"
 docker-compose up --build
 ```
 
-#### Deploy RAG-GPT from source code
+#### Deploy AlumBot from source code
 
 > [!NOTE]
 > Please use Python version 3.10.x or above.
@@ -301,7 +301,7 @@ pip install -r requirements.txt
 
 ##### Create SQLite Database
 
-The RAG-GPT service uses SQLite as its storage DB. Before starting the RAG-GPT service, you need to execute the following command to initialize the database and add the default configuration for admin console.
+The AlumBot service uses SQLite as its storage DB. Before starting the AlumBot service, you need to execute the following command to initialize the database and add the default configuration for admin console.
 
 ```shell
 python3 create_sqlite_db.py
@@ -309,7 +309,7 @@ python3 create_sqlite_db.py
 
 ##### Start the service
 
-If you have completed the steps above, you can try to start the RAG-GPT service by executing the following command.
+If you have completed the steps above, you can try to start the AlumBot service by executing the following command.
 
 - **Start single process:**
 
@@ -324,8 +324,8 @@ sh start.sh
 ```
 
 > [!NOTE]
-> - The service port for RAG-GPT is **`7000`**. During the first test, please try not to change the port so that you can quickly experience the entire product process.
-> - We recommend starting the RAG-GPT service using **`start.sh`** in multi-process mode for a smoother user experience.
+> - The service port for AlumBot is **`7000`**. During the first test, please try not to change the port so that you can quickly experience the entire product process.
+> - We recommend starting the AlumBot service using **`start.sh`** in multi-process mode for a smoother user experience.
 
 
 
@@ -333,7 +333,7 @@ sh start.sh
 
 ### Login to the admin console
 
-Access the admin console through the link **`http://your-server-ip:7000/open-kf-admin/`** to reach the login page. The default username and password are **`admin`** and **`open_kf_AIGC@2024`** (can be checked in `create_sqlite_db.py`).
+Access the admin console through the link **`http://your-server-ip:7000/alumbot-admin/`** to reach the login page. The default username and password are **`admin`** and **`alumBot_AIGC@2024`** (can be checked in `create_sqlite_db.py`).
 
 <div align="center">
 <img style="display: block; margin: auto; width: 70%;" src="./doc/screenshot-2.jpg">
@@ -345,7 +345,7 @@ After logging in successfully, you will be able to see the configuration page of
 <img style="display: block; margin: auto; width: 70%;" src="./doc/screenshot-3.jpg">
 </div>
 
-On the page **`http://your-server-ip:7000/open-kf-admin/#/`**, you can set the following configurations:
+On the page **`http://your-server-ip:7000/alumbot-admin/#/`**, you can set the following configurations:
 - Choose the LLM base, currently only the `gpt-3.5-turbo` option is available, which will be gradually expanded.
 - Initial Messages
 - Suggested Messages
@@ -364,7 +364,7 @@ After submitting the website URL, once the server retrieves the list of all web 
 <img style="display: block; margin: auto; width: 70%;" src="./doc/screenshot-12.jpg">
 </div>
 
-You can actively refresh the page **`http://your-server-ip:7000/open-kf-admin/#/source`** in your browser to get the progress of web page URL processing. After the content of the web page URL has been crawled, and the Embedding calculation and storage are completed, you can see the corresponding `Size` in the admin console, and the `Status` will also be updated to **`Trained`**.
+You can actively refresh the page **`http://your-server-ip:7000/alumbot-admin/#/source`** in your browser to get the progress of web page URL processing. After the content of the web page URL has been crawled, and the Embedding calculation and storage are completed, you can see the corresponding `Size` in the admin console, and the `Status` will also be updated to **`Trained`**.
 
 <div align="center">
 <img style="display: block; margin: auto; width: 70%;" src="./doc/screenshot-13.jpg">
@@ -401,7 +401,7 @@ Upload the required local files. You can upload up to `10` files at a time, and 
 
 ### Test the chatbot
 
-After importing website data in the admin console, you can experience the chatbot service through the link **`http://your-server-ip:7000/open-kf-chatbot/`**.
+After importing website data in the admin console, you can experience the chatbot service through the link **`http://your-server-ip:7000/alumBot/`**.
 
 <div align="center">
 <img style="display: block; margin: auto; width: 70%;" src="./doc/screenshot-6.jpg">
@@ -409,7 +409,7 @@ After importing website data in the admin console, you can experience the chatbo
 
 ### Embed on your website
 
-Through the admin console link **`http://your-server-ip:7000/open-kf-admin/#/embed`**, you can see the detailed tutorial for configuring the iframe in your website.
+Through the admin console link **`http://your-server-ip:7000/alumbot-admin/#/embed`**, you can see the detailed tutorial for configuring the iframe in your website.
 
 <div align="center">
 <img style="display: block; margin: auto; width: 70%;" src="./doc/screenshot-7.jpg">
@@ -424,7 +424,7 @@ Through the admin console link **`http://your-server-ip:7000/open-kf-admin/#/emb
 
 ### Dashboard of user's historical request
 
-Through the admin console link **`http://your-server-ip:7000/open-kf-admin/#/dashboard`**, you can view the historical request records of all users within a specified time range.
+Through the admin console link **`http://your-server-ip:7000/alumbot-admin/#/dashboard`**, you can view the historical request records of all users within a specified time range.
 
 <div align="center">
 <img style="display: block; margin: auto; width: 70%;" src="./doc/screenshot-9.jpg">
@@ -432,10 +432,9 @@ Through the admin console link **`http://your-server-ip:7000/open-kf-admin/#/das
 
 
 ## The frontend of admin console and chatbot
-The RAG-GPT service integrates 2 frontend modules, and their source code information is as follows:
+The AlumBot service integrates 2 frontend modules:
 
-### admin console
-> [Code Repository](https://github.com/open-kf/smart-qa-admin)
+### admin console> [Code Repository](https://github.com/open-kf/smart-qa-admin)
 
 An intuitive web-based admin interface for Smart QA Service, offering comprehensive control over content, configuration, and user interactions. Enables effortless management of the knowledge base, real-time monitoring of queries and feedback, and continuous improvement based on user insights.
 
@@ -443,4 +442,3 @@ An intuitive web-based admin interface for Smart QA Service, offering comprehens
 > [Code Repository](https://github.com/open-kf/smart-qa-h5)
 
 An HTML5 interface for Smart QA Service designed for easy integration into websites via iframe, providing users direct access to a tailored knowledge base without leaving the site, enhancing functionality and immediate query resolution.
-

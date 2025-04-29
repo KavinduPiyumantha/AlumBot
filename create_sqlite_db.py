@@ -245,7 +245,7 @@ def create_index():
 def init_admin_account():
     # Initialize admin account with predefined credentials
     account_name = 'admin'
-    password = 'open_kf_AIGC@2024'
+    password = 'alumBot_AIGC@2024'
     password_hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=10)
 
     conn = None
@@ -305,7 +305,7 @@ def init_bot_setting():
 
             # Add bot setting into Cache
             try:
-                key = "open_kf:bot_setting"
+                key = "alumBot:bot_setting"  # Updated from open_kf:bot_setting
                 bot_setting = {
                     'id': 1,
                     'initial_messages': initial_messages,
