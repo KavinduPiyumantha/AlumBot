@@ -28,6 +28,15 @@ Quickly launch an intelligent customer service system with Flask, LLM, RAG, incl
         - [Install dependencies with pip](#install-dependencies-with-pip)
       - [Create SQLite Database](#create-sqlite-database)
       - [Start the service](#start-the-service)
+- [Deploy to Azure Cloud](#deploy-to-azure-cloud)
+  - [Prerequisites](#prerequisites)
+  - [Step 1: Install and Set Up Azure CLI](#step-1-install-and-set-up-azure-cli)
+  - [Step 2: Create an Azure Container Registry (ACR)](#step-2-create-an-azure-container-registry-acr)
+  - [Step 3: Build and Push Docker Image to ACR](#step-3-build-and-push-docker-image-to-acr)
+  - [Step 4: Deploy to Azure Container Instances (ACI)](#step-4-deploy-to-azure-container-instances-aci)
+  - [Step 5: Configure Persistent Storage (Optional)](#step-5-configure-persistent-storage-optional)
+  - [Step 6: Update Your Application](#step-6-update-your-application)
+  - [Troubleshooting Azure Deployment](#troubleshooting-azure-deployment)
 - [Configure the admin console](#configure-the-admin-console)
   - [Login to the admin console](#login-to-the-admin-console)
   - [Import your data](#import-your-data)
@@ -328,6 +337,287 @@ sh start.sh
 > - The service port for AlumBot is **`7000`**. During the first test, please try not to change the port so that you can quickly experience the entire product process.
 > - We recommend starting the AlumBot service using **`start.sh`** in multi-process mode for a smoother user experience.
 
+
+
+## Deploy to Azure Cloud
+
+This section provides step-by-step instructions for deploying the AlumBot backend Docker image to Azure Cloud using Azure Container Instances (ACI).
+
+### Prerequisites
+
+Before you begin, make sure you have:
+
+- An active Azure subscription
+- The AlumBot code repository on your local machine
+- Docker installed on your local development machine
+- Basic familiarity with command-line tools
+
+### Step 1: Install and Set Up Azure CLI
+
+1. Download and install the Azure CLI from the official Microsoft website:
+   [https://aka.ms/installazurecliwindows](https://aka.ms/installazurecliwindows)
+
+2. After installation, open a new command prompt or PowerShell window and authenticate with your Azure account:
+
+   ```shell
+   az login
+   ```
+
+   This will open a browser window where you should sign in with your Azure account credentials.
+
+3. Verify the installation by checking the version:
+
+   ```shell
+   az --version
+   ```
+
+### Step 2: Create an Azure Container Registry (ACR)
+
+1. Create a resource group to organize all resources for AlumBot:
+
+   ```shell
+   az group create --name AlumBotResourceGroup --location eastus
+   ```
+
+2. Create an Azure Container Registry to store your Docker images:
+
+   ```shell
+   az acr create --resource-group AlumBotResourceGroup --name alumbotreg --sku Basic
+   ```
+
+   > Note: Registry names must be unique across Azure. If 'alumbotreg' is already taken, choose a different name.
+
+3. Enable admin access to your registry (needed for ACI to pull images):
+
+   ```shell
+   az acr update --name alumbotreg --admin-enabled true
+   ```
+
+4. Get the registry credentials for later use:
+
+   ```shell
+   az acr credential show --name alumbotreg
+   ```
+
+   Save the username and password values for the next steps.
+
+### Step 3: Build and Push Docker Image to ACR
+
+1. Navigate to your AlumBot directory:
+
+   ```shell
+   cd path/to/AlumBot
+   ```
+
+2. Before building the image, ensure you've updated the `.env` file with the correct configuration for production. In particular, update the `URL_PREFIX` to match your Azure deployment URL:
+
+   ```
+   URL_PREFIX="http://your-dns-name-label.region.azurecontainer.io:7000/"
+   ```
+
+   For example: `URL_PREFIX="http://alumbot.eastus.azurecontainer.io:7000/"`
+
+3. Log in to your Azure Container Registry:
+
+   ```shell
+   az acr login --name alumbotreg
+   ```
+
+4. Build and tag your Docker image:
+
+   ```shell
+   docker build -t alumbotreg.azurecr.io/alumbot:latest .
+   ```
+
+5. Push the image to ACR:
+
+   ```shell
+   docker push alumbotreg.azurecr.io/alumbot:latest
+   ```
+
+### Step 4: Deploy to Azure Container Instances (ACI)
+
+1. Deploy your AlumBot container to Azure Container Instances:
+
+   ```shell
+   az container create \
+     --resource-group AlumBotResourceGroup \
+     --name alumbot-container \
+     --image alumbotreg.azurecr.io/alumbot:latest \
+     --dns-name-label alumbot \
+     --ports 7000 \
+     --registry-username alumbotreg \
+     --registry-password <password-from-acr-credentials> \
+     --os-type Linux \
+     --cpu 1 \
+     --memory 1.5
+   ```
+
+   > Note: Replace `<password-from-acr-credentials>` with the password you obtained in Step 2.4.
+   > 
+   > If the `dns-name-label` 'alumbot' is already in use in your region, choose a different name.
+
+2. Check the deployment status:
+
+   ```shell
+   az container show \
+     --resource-group AlumBotResourceGroup \
+     --name alumbot-container \
+     --query "{FQDN:ipAddress.fqdn,ProvisioningState:provisioningState,State:instanceView.state}" \
+     --out table
+   ```
+
+3. Once deployed, your AlumBot will be accessible at:
+
+   ```
+   http://alumbot.eastus.azurecontainer.io:7000
+   ```
+
+   > Note: Replace 'alumbot' with your actual DNS name label and 'eastus' with your deployment region if different.
+
+### Step 5: Configure Persistent Storage (Optional)
+
+For production deployments, you'll want to set up persistent storage for your databases:
+
+1. Create a storage account:
+
+   ```shell
+   az storage account create \
+     --resource-group AlumBotResourceGroup \
+     --name alumbotstore \
+     --location eastus \
+     --sku Standard_LRS
+   ```
+
+2. Get the storage account key:
+
+   ```shell
+   az storage account keys list \
+     --resource-group AlumBotResourceGroup \
+     --account-name alumbotstore \
+     --query "[0].value" \
+     --output tsv
+   ```
+
+3. Create a file share:
+
+   ```shell
+   az storage share create \
+     --name alumbot-data \
+     --account-name alumbotstore \
+     --account-key <storage-key>
+   ```
+
+4. Recreate your container with persistent storage:
+
+   ```shell
+   az container create \
+     --resource-group AlumBotResourceGroup \
+     --name alumbot-container \
+     --image alumbotreg.azurecr.io/alumbot:latest \
+     --dns-name-label alumbot \
+     --ports 7000 \
+     --registry-username alumbotreg \
+     --registry-password <password> \
+     --os-type Linux \
+     --cpu 1 \
+     --memory 1.5 \
+     --azure-file-volume-account-name alumbotstore \
+     --azure-file-volume-account-key <storage-key> \
+     --azure-file-volume-share-name alumbot-data \
+     --azure-file-volume-mount-path /app/data
+   ```
+
+   You may need to modify your application to use the `/app/data` directory for storing SQLite databases and other persistent data.
+
+### Step 6: Update Your Application
+
+When you need to deploy updates to your AlumBot application:
+
+1. Make your code changes locally
+
+2. For the AlumBot-Client, create a `.env.production` file with the appropriate settings:
+
+   ```
+   # Production environment
+   VITE_BASE_URL=http://alumbot.eastus.azurecontainer.io:7000/
+   ```
+
+3. Build and push the updated Docker image:
+
+   ```shell
+   docker build -t alumbotreg.azurecr.io/alumbot:latest .
+   az acr login --name alumbotreg
+   docker push alumbotreg.azurecr.io/alumbot:latest
+   ```
+
+4. Restart or recreate your container to apply the changes:
+
+   ```shell
+   # Option 1: Restart the container (if the image tag hasn't changed)
+   az container restart --resource-group AlumBotResourceGroup --name alumbot-container
+   
+   # Option 2: Recreate the container (to force pulling the new image)
+   az container delete --resource-group AlumBotResourceGroup --name alumbot-container --yes
+   az container create --resource-group AlumBotResourceGroup --name alumbot-container --image alumbotreg.azurecr.io/alumbot:latest --dns-name-label alumbot --ports 7000 --registry-username alumbotreg --registry-password <password> --os-type Linux --cpu 1 --memory 1.5
+   ```
+
+### Troubleshooting Azure Deployment
+
+Here are solutions to common issues you might encounter during deployment:
+
+1. **Resource Provider Not Registered**
+
+   If you receive an error about "MissingSubscriptionRegistration" for Microsoft.ContainerInstance:
+
+   ```shell
+   az provider register --namespace Microsoft.ContainerInstance
+   ```
+
+   Wait a few minutes for the registration to complete before trying again.
+
+2. **Container OS Type Error**
+
+   If you see an error about invalid OS type:
+
+   ```
+   (InvalidOsType) The 'osType' for container group is invalid
+   ```
+
+   Make sure to include the `--os-type Linux` parameter in your `az container create` command.
+
+3. **Resource Requests Not Specified**
+
+   If you receive an error about resource requests not being specified:
+
+   ```
+   (ResourceRequestsNotSpecified) The resource requests are not specified
+   ```
+
+   Include the `--cpu` and `--memory` parameters in your `az container create` command.
+
+4. **Unable to Connect to Your Container**
+
+   If you can't connect to your deployed container, check:
+   
+   - Verify the container is running: `az container show --resource-group AlumBotResourceGroup --name alumbot-container --query "instanceView.state"`
+   - Check container logs: `az container logs --resource-group AlumBotResourceGroup --name alumbot-container`
+   - Confirm port 7000 is exposed and accessible
+
+5. **Case-Sensitivity URL Issues**
+
+   If you encounter issues with URLs being case-sensitive (e.g., `/alumBot` vs `/alumbot`), update your routes in `rag_gpt_app.py` to handle both cases as shown below:
+
+   ```python
+   # Add lowercase route handlers alongside the original case-sensitive routes
+   @app.route('/alumbot', strict_slashes=False)
+   def index_chatbot_lowercase():
+       return send_from_directory(f'{app.static_folder}/alumBot', 'index.html')
+
+   @app.route('/alumbot/<path:path>')
+   def serve_static_chatbot_lowercase(path):
+       return send_from_directory(f'{app.static_folder}/alumBot', path)
+   ```
 
 
 ## Configure the admin console

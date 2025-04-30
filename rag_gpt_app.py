@@ -45,15 +45,27 @@ def serve_media_file(filename):
         return abort(404)
 
 
-# Route for the homepage of the 'alumBot' site
+# Route for the homepage of the 'alumBot' site (original case-sensitive route)
 @app.route('/alumBot', strict_slashes=False)
 def index_chatbot():
     return send_from_directory(f'{app.static_folder}/alumBot', 'index.html')
 
 
-# Route for serving other static files of the 'alumBot' application
+# Route for serving other static files of the 'alumBot' application (original case-sensitive route)
 @app.route('/alumBot/<path:path>')
 def serve_static_chatbot(path):
+    return send_from_directory(f'{app.static_folder}/alumBot', path)
+
+
+# New lowercase route for the homepage of the 'alumbot' site
+@app.route('/alumbot', strict_slashes=False)
+def index_chatbot_lowercase():
+    return send_from_directory(f'{app.static_folder}/alumBot', 'index.html')
+
+
+# New lowercase route for serving other static files of the 'alumbot' application
+@app.route('/alumbot/<path:path>')
+def serve_static_chatbot_lowercase(path):
     return send_from_directory(f'{app.static_folder}/alumBot', path)
 
 
