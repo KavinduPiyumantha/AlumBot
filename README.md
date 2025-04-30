@@ -36,6 +36,7 @@ Quickly launch an intelligent customer service system with Flask, LLM, RAG, incl
   - [Step 4: Deploy to Azure Container Instances (ACI)](#step-4-deploy-to-azure-container-instances-aci)
   - [Step 5: Configure Persistent Storage (Optional)](#step-5-configure-persistent-storage-optional)
   - [Step 6: Update Your Application](#step-6-update-your-application)
+  - [Updating the Azure Deployment with Clean Database](#updating-the-azure-deployment-with-clean-database)
   - [Troubleshooting Azure Deployment](#troubleshooting-azure-deployment)
 - [Configure the admin console](#configure-the-admin-console)
   - [Login to the admin console](#login-to-the-admin-console)
@@ -555,6 +556,7 @@ When you need to deploy updates to your AlumBot application:
 
    ```shell
    # Option 1: Restart the container (if the image tag hasn't changed)
+
    az container restart --resource-group AlumBotResourceGroup --name alumbot-container
    
    # Option 2: Recreate the container (to force pulling the new image)
