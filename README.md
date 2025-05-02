@@ -293,13 +293,14 @@ It is recommended to install Python-related dependencies in a Python virtual env
 If you have not yet created a virtual environment, you can create one with the following command:
 
 ```shell
-python3 -m venv myenv
+python -m venv myenv
 ```
 
 After creation, activate the virtual environment:
 
 ```shell
 source myenv/bin/activate
+ .\myenv\Scripts\Activate.ps1
 ```
 
 ###### Install dependencies with pip
@@ -315,7 +316,7 @@ pip install -r requirements.txt
 The AlumBot service uses SQLite as its storage DB. Before starting the AlumBot service, you need to execute the following command to initialize the database and add the default configuration for admin console.
 
 ```shell
-python3 create_sqlite_db.py
+python create_sqlite_db.py
 ```
 
 ##### Start the service
@@ -325,7 +326,7 @@ If you have completed the steps above, you can try to start the AlumBot service 
 - **Start single process:**
 
 ```shell
-python3 rag_gpt_app.py
+python rag_gpt_app.py
 ```
 
 - **Start multiple processes:**
