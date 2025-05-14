@@ -28,6 +28,7 @@ BOT_TOPIC = os.getenv('BOT_TOPIC')
 USE_PREPROCESS_QUERY = int(os.getenv('USE_PREPROCESS_QUERY'))
 USE_RERANKING = int(os.getenv('USE_RERANKING'))
 USE_DEBUG = int(os.getenv('USE_DEBUG'))
+IS_STRICT_TO_ENGLISH = int(os.getenv('IS_STRICT_TO_ENGLISH', '0'))
 
 queries_bp = Blueprint('queries', __name__, url_prefix='/alumBot_api/queries')
 
@@ -245,6 +246,8 @@ def generate_answer(query: str, user_id: str, is_streaming: bool = False):
 
     # Detect the language of the query
     lang = detect_query_lang(query)
+    if IS_STRICT_TO_ENGLISH:
+        lang = 'English'
     logger.warning(f"For query: '{query}', detect the language is '{lang}'!")
 
     history_context = f"""Human: Hello
