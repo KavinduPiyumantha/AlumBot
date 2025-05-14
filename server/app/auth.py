@@ -15,6 +15,36 @@ def get_token():
             'message': 'user_id is required',
             'data': {}
         }
+    
+    # Check if authentication is required
+    conn = None
+    require_auth = False
+    
+    try:
+        from server.app.utils.sqlite_client import get_db_connection
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        # Check if we have any accounts in the database
+        cur.execute('SELECT COUNT(*) as count FROM t_account_tab')
+        result = cur.fetchone()
+        # If there are accounts, require authentication
+        if result and result['count'] > 0:
+            require_auth = True
+            
+        # If authentication is required, deny token generation without login
+        if require_auth:
+            return {
+                'retcode': -20002,
+                'message': 'Authentication required. Please login first.',
+                'data': {}
+            }
+            
+    except Exception as e:
+        logger.error(f"Error checking authentication requirement: {e}")
+    finally:
+        if conn:
+            conn.close()
 
     try:
         # generate token

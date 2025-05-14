@@ -55,25 +55,47 @@ def clean_database():
         print("[INFO] Cleaning chat history...")
         cur.execute("DELETE FROM t_user_qa_record_tab")
         
-        # 6. Verify no trained data remains by checking all related tables
+        # 6. Clean user data tables
+        print("[INFO] Cleaning user data tables...")
+        # Preserve admin accounts but clean other user data
+        cur.execute("DELETE FROM t_user_data_tab")
+        cur.execute("DELETE FROM t_user_preferences_tab")
+        
+        # 7. Clean uploaded file details
+        print("[INFO] Cleaning uploaded file details...")
+        cur.execute("DELETE FROM t_file_upload_history_tab")
+        cur.execute("DELETE FROM t_file_meta_tab")
+        
+        # 8. Verify no trained data remains by checking all related tables
         print("[INFO] Verifying cleanup of trained data...")
         tables_to_verify = [
             "t_sitemap_url_tab", 
             "t_isolated_url_tab", 
             "t_local_file_tab", 
             "t_local_file_chunk_tab", 
-            "t_doc_embedding_map_tab"
+            "t_doc_embedding_map_tab",
+            "t_user_qa_record_tab",
+            "t_user_data_tab",
+            "t_user_preferences_tab",
+            "t_file_upload_history_tab",
+            "t_file_meta_tab"
         ]
         
         for table in tables_to_verify:
-            cur.execute(f"SELECT COUNT(*) FROM {table}")
-            count = cur.fetchone()[0]
-            if count > 0:
-                print(f"[WARNING] {table} still has {count} records. Attempting deeper cleanup...")
-                cur.execute(f"DELETE FROM {table}")
-                conn.commit()
+            try:
+                cur.execute(f"SELECT COUNT(*) FROM {table}")
+                count = cur.fetchone()[0]
+                if count > 0:
+                    print(f"[WARNING] {table} still has {count} records. Attempting deeper cleanup...")
+                    cur.execute(f"DELETE FROM {table}")
+                    conn.commit()
+            except sqlite3.OperationalError as e:
+                if "no such table" in str(e):
+                    print(f"[INFO] Table {table} does not exist, skipping.")
+                else:
+                    raise e
         
-        # 7. Reset any sequence counters for tables we've cleared
+        # 9. Reset any sequence counters for tables we've cleared
         # This helps ensure new entries start with fresh IDs
         print("[INFO] Resetting table sequence counters...")
         for table in tables_to_verify:

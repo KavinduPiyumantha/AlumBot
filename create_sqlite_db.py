@@ -243,9 +243,9 @@ def create_index():
 
 
 def init_admin_account():
-    # Initialize admin account with predefined credentials
-    account_name = 'admin'
-    password = 'alumBot_AIGC@2024'
+    # Initialize admin account with credentials from environment variables
+    account_name = os.getenv('ADMIN_USERNAME', 'admin')
+    password = os.getenv('ADMIN_PASSWORD', 'admin@123')
     password_hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=10)
 
     conn = None
@@ -269,6 +269,40 @@ def init_admin_account():
         if conn:
             conn.close()
 
+    # Add client account into Cache
+def create_test_user():
+    
+    try:
+        conn = sqlite3.connect(f'{SQLITE_DB_DIR}/{SQLITE_DB_NAME}')
+        cur = conn.cursor()
+        
+        # Get test user credentials from environment variables
+        test_username = os.getenv('TEST_USERNAME', 'test')
+        test_password = os.getenv('TEST_PASSWORD', 'password')
+        
+        # Check if user already exists
+        cur.execute("SELECT id FROM t_account_tab WHERE account_name = ?", (test_username,))
+        if cur.fetchone():
+            print(f"Test user '{test_username}' already exists")
+            return
+        
+        # Create test user
+        current_time = int(time.time())
+        password_hash = generate_password_hash(test_password)
+        cur.execute(
+            """
+            INSERT INTO t_account_tab (account_name, password_hash, is_login, ctime, mtime) 
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (test_username, password_hash, 0, current_time, current_time)    )
+        conn.commit()
+    except Exception as e:
+        print(f"[ERROR] create test user is failed, the exception is {e}")
+    finally:
+        if conn:
+            print(f"Test user created with username: '{test_username}' and password: '{test_password}'")
+            conn.close()
+    
 
 def init_bot_setting():
     # Initialize bot settings
@@ -335,6 +369,8 @@ if __name__ == '__main__':
     create_index()
     print('Initialize the admin account')
     init_admin_account()
+    print('Create test user')
+    create_test_user()
     print('Initialize the bot settings')
     init_bot_setting()
     print('SQLite init Done!\n\n')
