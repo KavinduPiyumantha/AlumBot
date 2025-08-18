@@ -327,9 +327,11 @@ The response should be a JSON object, with 'answer' and 'source' fields.
 - "source": ["List only unique `Citation URL` from the context that are directly related to the answer. Ensure that each URL is listed only once. If no documents are referenced, or the documents are not relevant, use an empty list []. The number of `Citation URL` should not exceed {RECALL_TOP_K}. The generated answer must have indeed used content from the document corresponding to the `Citation URL` before including that URL in the `source`; otherwise, the URL should not be included in the `source`."]'''
     else:
         answer_format_prompt = '''**Expected Response Format:**
-The response should be fully formatted using **Mardown** syntax (Note: Don't start with 'Answer:' or 'answer:'). First output the answer. Then output the Sources.
+The response should be fully formatted using **Mardown** syntax (Note: Don't start with 'Answer:' or 'answer:').
 - A detailed and specific answer, crafted in the question's language. Don't repeat the question. Only cite the most relevant Documents that answer the question accurately.
-- Sources: "List only unique `Citation URL` from the context that are directly related to the answer. Ensure that each URL is listed only once. If no documents are referenced, or the documents are not relevant, return ''. The number of `Citation URL` should not exceed {RECALL_TOP_K}. The generated answer must have indeed used content from the document corresponding to the `Citation URL` before including that URL in the `Sources`; otherwise, the URL should not be included in the `Sources`."'''
+- Do NOT include any "Sources:" section, URLs, or citation information in your response.
+- Do NOT include any reference links or document attributions at the end of your response.
+- End your response after the main answer content without any additional sections.'''
 
     prompt = f"""
 You are a smart customer service assistant and problem-solver, tasked to answer any question about `{bot_topic}`. Using the provided context, answer the user's question to the best of your ability using the resources provided.
@@ -362,7 +364,6 @@ The answer must be fully formatted using Markdown syntax. This includes:
 - **Bold** (`**bold**`) and *italic* (`*italic*`) text for emphasis.
 - Unordered lists (`- item`) for itemization and ordered lists (`1. item`) for sequencing.
 - `Inline code` (`` `Inline code` ``) for brief code snippets and (` ``` `) for longer examples, specifying the programming language for syntax highlighting when possible.
-- [Hyperlinks](URL) (`[Hyperlinks](URL)`) to reference external sources.
 - Headings (`# Heading 1`, `## Heading 2`, ...) to structure the answer effectively.
 """
 
